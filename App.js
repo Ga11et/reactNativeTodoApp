@@ -1,20 +1,27 @@
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { Main } from './src/components/main/main';
+import { TodoForm } from './src/components/todoForm/todoForm';
 
 export default function App() {
-  return (
+
+  const [activePage, setActivePage] = useState('main')
+
+  return <>
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+      {activePage === 'main' && <Main setActivePage={setActivePage} />}
+      {activePage === 'todoForm' && <TodoForm setActivePage={setActivePage} />}
       <StatusBar style="auto" />
     </View>
-  );
+  </>;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
 });

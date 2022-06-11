@@ -18,7 +18,6 @@ export const AppWithProvider: FC<AppWithProviderPropsType> = ({  }) => {
 
   const activePageHandler = (id: string) => {
     const index = todoGroups.findIndex(el => el.id === id)
-    console.log(index, id, todoGroups.length)
     if (index != -1) {
       setActiveFormIndex(index)
       setActivePage('todoForm')

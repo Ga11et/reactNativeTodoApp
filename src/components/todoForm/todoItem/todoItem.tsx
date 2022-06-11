@@ -1,6 +1,7 @@
 import { FC, useRef, useState } from "react"
 import { Animated, PanResponder, StyleSheet, TextInput, View } from "react-native"
 import { useDispatch } from "react-redux"
+import { useAppDispatch } from "../../../hooks/hooks"
 import { todoType } from "../../../models/models"
 import {TodosReducer} from "../../../store/reducers/TodosReducer"
 import { Checkbox } from "../../common/checkbox"
@@ -9,26 +10,38 @@ import { Item } from "./item/item"
 
 type TodoItemPropsType = {
     content: todoType
-
-    setIsChecked: (some: boolean, id: string) => void
-    setTextChanged: (some: string, id: string) => void
-    deleteItem: (todo: todoType) => void
+    todoGroupId: string
 }
-export const TodoItem: FC<TodoItemPropsType> = ({ content, setIsChecked, setTextChanged, deleteItem }) => {
+export const TodoItem: FC<TodoItemPropsType> = ({ content, todoGroupId }) => {
 
-    const {id, isChecked, text} = content
+    const {id, isChecked, text, isActive} = content
 
-    const [isActive, setisActive] = useState(true)
-    const [Itext, setText] = useState(content.text)
+    const dispatch = useAppDispatch()
+
+    const [Itext, setText] = useState(text)
 
     const onPressHandler = () => {
         isChecked
-            ? setIsChecked(false, id)
-            : setIsChecked(true, id)
+            ? setIsChecked(false)
+            : setIsChecked(true)
     }
     const onEndEditingHandler = () => {
-        setisActive(false)
-        setTextChanged(Itext, id)
+        dispatch(TodosReducer.actions.todoUpdating({ todoGroupId: todoGroupId, todoId: id, todo: {
+            id, isActive: false, isChecked, text: Itext
+        } }))
+    }
+    const setisActive = (isActive: boolean) => {
+        dispatch(TodosReducer.actions.todoUpdating({ todoGroupId: todoGroupId, todoId: id, todo: {
+            id, isActive, isChecked, text
+        } }))
+    }
+    const setIsChecked = (isChecked: boolean) => {
+        dispatch(TodosReducer.actions.todoUpdating({ todoGroupId: todoGroupId, todoId: id, todo: {
+            id, isActive, isChecked, text
+        } }))
+    }
+    const deleteItem = () => {
+        dispatch(TodosReducer.actions.todoDeleting({ todoGroupId: todoGroupId, todo: content }))
     }
 
     const pan = useRef(new Animated.ValueXY()).current
@@ -46,7 +59,7 @@ export const TodoItem: FC<TodoItemPropsType> = ({ content, setIsChecked, setText
         },
         onPanResponderRelease: (event, state) => {
             const dx = state.dx
-            if (dx > 200) deleteItem(content) 
+            if (dx > 200) deleteItem() 
             Animated.spring(
                 pan,
                 { toValue: { x: 0, y: 0 }, useNativeDriver: true }

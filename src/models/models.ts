@@ -2,6 +2,7 @@ export type todoType = {
     id: string
     text: string
     isChecked: boolean
+    isActive: boolean
 }
 export type todoGroupType = {
     id: string

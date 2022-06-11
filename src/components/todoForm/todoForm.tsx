@@ -17,50 +17,16 @@ export const TodoForm: FC<TodoFormPropsType> = ({ setActivePage, content }) => {
 
     const { id, name, countDoneTodos, countTodos, todos } = content
 
-    const [todos2, setTodos] = useState<todoType[]>([])
-    const [taskNumber, setTaskNumber] = useState(0)
-    const [doneTaskNumber, setDoneTaskNumber] = useState(0)
-    const [heading, setHeading] = useState<string>()
-
     const dispatch = useAppDispatch()
 
-    const checkTodoHandler = (some: boolean, id: string) => {
-        setTodos(prev => {
-            prev.forEach(el => {
-                if (el.id === id) el.isChecked = some
-            })
-            return [...prev]
-        })
-        setDoneTaskNumber(prev => prev + 1)
-    }
-
     const addTodoHandler = () => {
-        const id = Date.now().toString()
-        const text = 'new Todo'
-        setTodos(prev => {
-            return [
-                ...prev,
-                { id: id, text: text, isChecked: false }
-            ]
-        })
-        setTaskNumber(prev => prev+1)
-        dispatch(TodosReducer.actions.todoAdding({ todoGroupId: id, todo: { id: id, text: text, isChecked: false } }))
+        const todoId = Date.now().toString()
+        dispatch(TodosReducer.actions.todoAdding({ todoGroupId: id, todo: { id: todoId, text: 'new Todo', isChecked: false, isActive: true } }))
     }
-
-    const changeTextTodoHandler = (text: string, id: string) => {
-        setTodos(prev => {
-            prev.forEach(el => {
-                if (el.id === id) el.text = text
-            })
-            return prev
-        })
-    }
-    const DeleteTodoHandler = (todo: todoType) => {
-        setTodos(prev => {
-            return prev.filter(el => el.id !== todo.id)
-        })
-        setTaskNumber(prev => prev - 1)
-        if (todo.isChecked) setDoneTaskNumber(prev => prev - 1)
+    const setHeading = (newHeading: string) => {
+        dispatch(TodosReducer.actions.todoGroupUpdating({
+            countDoneTodos, countTodos, id, todos, name: newHeading
+        }))
     }
 
     const exitButtonPressHandler = () => {
@@ -80,12 +46,10 @@ export const TodoForm: FC<TodoFormPropsType> = ({ setActivePage, content }) => {
                 />
             </View>
             <ScrollView>
-                <Heading taskCount={taskNumber} doneTaskCount={doneTaskNumber} headingCallBack={setHeading} groupName={name} />
+                <Heading taskCount={countTodos} doneTaskCount={countDoneTodos} headingCallBack={setHeading} groupName={name} />
                 <View style={style.listContainer}>
-                    {todos.map(el => <TodoItem content={el} key={el.id} 
-                        setIsChecked={checkTodoHandler} 
-                        setTextChanged={changeTextTodoHandler}
-                        deleteItem={DeleteTodoHandler}
+                    {todos.map(el => <TodoItem content={el} key={el.id}
+                        todoGroupId={id}
                     />)}
                 </View>
             </ScrollView>

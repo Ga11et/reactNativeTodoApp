@@ -4,14 +4,16 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 type CheckboxPropsType = {
     onPress: () => void
     isChecked: boolean
+
+    color?: string
 }
-export const Checkbox: FC<CheckboxPropsType> = ({ onPress, isChecked }) => {
+export const Checkbox: FC<CheckboxPropsType> = ({ onPress, isChecked, color = 'grey' }) => {
 
     return <>
         <TouchableOpacity activeOpacity={0.7}
             onPress={onPress}
         >
-            {!isChecked && <View style={style.container}>
+            {!isChecked && <View style={[style.container, { borderColor: color }]}>
 
             </View>
             }
@@ -26,7 +28,6 @@ const style = StyleSheet.create({
         height: 20,
         width: 20,
         borderWidth: 1,
-        borderColor: 'grey',
         borderRadius: 4
     },
     content: {

@@ -1,5 +1,5 @@
 import { FC } from "react"
-import { StyleSheet, Text, View } from "react-native"
+import { Image, StyleSheet, Text, View } from "react-native"
 import { CustomText } from "../common/customText"
 
 type HeaderPropsType = {
@@ -8,6 +8,9 @@ type HeaderPropsType = {
 export const Header: FC<HeaderPropsType> = ({  }) => {
     return <>
         <View style={style.container}>
+            <Image source={require('../../../assets/logo.jpg')} 
+                style={style.logo}
+            />
             <View style={style.textContainer}>
                 <CustomText addStyle={style.text} text='Tasks' fontType="400" />
                 <CustomText addStyle={style.textGrey} text=' List' fontType="400" />
@@ -42,5 +45,12 @@ const style = StyleSheet.create({
     textGrey: {
         fontSize: 40,
         color: 'grey',
+    },
+    logo: {
+        position: 'absolute',
+        top: 70,
+        left: 35,
+        width: 70,
+        height: 70
     }
 })

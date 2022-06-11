@@ -3,4 +3,11 @@ export type todoType = {
     text: string
     isChecked: boolean
 }
+export type todoGroupType = {
+    id: string
+    name: string
+    todos: todoType[]
+    countDoneTodos: number
+    countTodos: number
+}
 export type PagesTypes = 'main' | 'todoForm'

@@ -1,16 +1,20 @@
 import { FC, useRef, useState } from "react"
 import { Animated, PanResponder, StyleSheet, TextInput, View } from "react-native"
+import { useDispatch } from "react-redux"
 import { todoType } from "../../../models/models"
+import {TodosReducer} from "../../../store/reducers/TodosReducer"
 import { Checkbox } from "../../common/checkbox"
 import { CustomText } from "../../common/customText"
+import { Item } from "./item/item"
 
 type TodoItemPropsType = {
     content: todoType
 
     setIsChecked: (some: boolean, id: string) => void
     setTextChanged: (some: string, id: string) => void
+    deleteItem: (todo: todoType) => void
 }
-export const TodoItem: FC<TodoItemPropsType> = ({ content, setIsChecked, setTextChanged }) => {
+export const TodoItem: FC<TodoItemPropsType> = ({ content, setIsChecked, setTextChanged, deleteItem }) => {
 
     const {id, isChecked, text} = content
 
@@ -42,6 +46,7 @@ export const TodoItem: FC<TodoItemPropsType> = ({ content, setIsChecked, setText
         },
         onPanResponderRelease: (event, state) => {
             const dx = state.dx
+            if (dx > 200) deleteItem(content) 
             Animated.spring(
                 pan,
                 { toValue: { x: 0, y: 0 }, useNativeDriver: true }
@@ -58,16 +63,12 @@ export const TodoItem: FC<TodoItemPropsType> = ({ content, setIsChecked, setText
                     onEndEditing={onEndEditingHandler}
                     onChangeText={(text) => setText(text)}
                     value={Itext}
+                    autoFocus
                 />
                 : <Animated.View style={[style.container, { translateX: pan.x }]}
                     {...panResponder.panHandlers}
                 >
-                    <View style={style.leftBox}>
-                        <Checkbox isChecked={isChecked} onPress={onPressHandler} />
-                    </View>
-                    <View style={style.rightBox}>
-                        <CustomText fontType="700" text={text} addStyle={isChecked ? style.checked : {}} />
-                    </View>
+                    <Item content={content} onPressHandler={onPressHandler} />
                     <View style={style.delete}><CustomText addStyle={style.deleteText} fontType="400" text="Delete" /></View>
                     <View style={style.edit}><CustomText addStyle={style.deleteText} fontType="400" text="Edit" /></View>
                 </Animated.View>
@@ -84,14 +85,6 @@ const style = StyleSheet.create({
         paddingVertical: 10,
         position: 'relative'
     },
-    leftBox: {
-        width: 100,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-    rightBox: {
-
-    },
     input: {
         borderBottomWidth: 1,
         borderBottomColor: 'grey',
@@ -100,11 +93,6 @@ const style = StyleSheet.create({
         paddingHorizontal: 20,
         fontSize: 20,
         fontWeight: '700',
-    },
-    checked: {
-        color: 'red',
-        textDecorationLine: 'line-through',
-        textDecorationColor: 'red'
     },
     delete: {
         position: 'absolute',

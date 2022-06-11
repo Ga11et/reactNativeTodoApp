@@ -1,7 +1,5 @@
-import { Montserrat_300Light } from "@expo-google-fonts/montserrat"
 import { FC } from "react"
-import { StyleSheet, View } from "react-native"
-import { todoType } from "../../../models/models"
+import { Image, StyleSheet, View } from "react-native"
 import { CustomButton } from "../../common/button"
 
 type FormFooterPropsType = {
@@ -10,6 +8,9 @@ type FormFooterPropsType = {
 export const FormFooter: FC<FormFooterPropsType> = ({ addTask }) => {
     return <>
         <View style={style.container}>
+            <Image source={require('../../../../assets/footer.jpg')} 
+                style={style.image}
+            />
             <CustomButton title="+"
                 onPress={() => addTask()}
                 addStyles={style.button}
@@ -34,5 +35,12 @@ const style = StyleSheet.create({
     text: {
         color: 'white',
         fontSize: 30,
+    },
+    image: {
+        position: 'absolute',
+        left: 30,
+        top: 5,
+        width: 200,
+        height: 100
     }
 })

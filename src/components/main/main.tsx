@@ -1,58 +1,54 @@
-import { FC, useRef } from "react"
-import { Animated, PanResponder, StyleSheet, View } from "react-native"
+import { FC } from "react"
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import { useDispatch } from "react-redux"
+import { useAppSelector } from "../../hooks/hooks"
+import { todoGroupType } from "../../models/models"
+import { TodosReducer } from "../../store/reducers/TodosReducer"
 import { CustomButton } from "../common/button"
 import { CustomText } from "../common/customText"
 import { Header } from "../header/header"
+import { TodoGroup } from "./todoGroup/todoGroup"
 
 type MainPropsType = {
-    setActivePage: (text: string) => void
+    setActivePage: (id: string) => void
 }
 export const Main: FC<MainPropsType> = ({ setActivePage }) => {
 
-    const pan = useRef(new Animated.ValueXY()).current
+    const { todoGroups } = useAppSelector(state => state.TodosReducer)
+    const dispatch = useDispatch()
 
-    let panCorrd = {x: 0, y: 0}
-
-    const panResponder = useRef(PanResponder.create({
-        onMoveShouldSetPanResponder: () => {
-            return true
-        },
-        onPanResponderGrant: (event, state) => {
-            pan.setOffset(panCorrd)
-        },
-        onPanResponderMove: (event, state) => {
-            Animated.event([
-                null,
-                { dx: pan.x, dy: pan.y } 
-            ],
-                { useNativeDriver: false }
-            )(event, state)
-        },
-        onPanResponderRelease: (event, state) => {
-            panCorrd = {
-                x: panCorrd.x + state.dx,
-                y: panCorrd.y + state.dy
-            }
-            pan.flattenOffset()
+    const onPlusButtonHandler = () => {
+        const data: todoGroupType = {
+            id: Date.now().toString(),
+            name: '',
+            todos: [],
+            countDoneTodos: 0,
+            countTodos: 0
         }
+        dispatch(TodosReducer.actions.todoGroupAdding(data))
+        setTimeout(() => {
+            console.log(todoGroups.length)
+            setActivePage(data.id)
+        }, 1000)
+    }
 
-    })).current
     return <>
         <Header />
         <View style={style.container}>
             <View style={style.buttonContainer}>
                 <CustomButton title="+"
-                    onPress={() => setActivePage('todoForm')}
+                    onPress={onPlusButtonHandler}
                 />
                 <CustomText addStyle={style.buttonContainer__text} fontType='700' text="Add list" />
             </View>
-            <Animated.View
-                style={[{ translateX: pan.x, translateY: pan.y }]}
-                {...panResponder.panHandlers}
-            >
-                <View style={style.box}></View>
-            </Animated.View>
-            {/* <CustomText fontType="700" text="123" /> */}
+            <ScrollView horizontal style={style.todoGroups} >
+                {todoGroups.map(el => <TouchableOpacity key={el.id}
+                        activeOpacity={0.7}
+                        onPress={() => setActivePage(el.id)}
+                    >
+                        <TodoGroup content={el} />
+                    </TouchableOpacity>)}
+            </ScrollView>
         </View>
     </>
 }
@@ -81,10 +77,9 @@ const style = StyleSheet.create({
         paddingTop: 8,
         fontSize: 15
     },
-    box: {
-        width: 200,
-        height: 50,
-        backgroundColor: 'blue',
-        borderRadius: 9
+    todoGroups: {
+        marginHorizontal: 50,
+        flexDirection: 'row',
+        height: '100%',
     }
 })

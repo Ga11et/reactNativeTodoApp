@@ -9,11 +9,9 @@ import { Heading } from "./heading/heading"
 import { TodoItem } from "./todoItem/todoItem"
 
 type TodoFormPropsType = {
-    setActivePage: (text: PagesTypes) => void
-
     content: todoGroupType
 }
-export const TodoForm: FC<TodoFormPropsType> = ({ setActivePage, content }) => {
+export const TodoForm: FC<TodoFormPropsType> = ({ content }) => {
 
     const { id, name, countDoneTodos, countTodos, todos } = content
 
@@ -30,7 +28,7 @@ export const TodoForm: FC<TodoFormPropsType> = ({ setActivePage, content }) => {
     }
 
     const exitButtonPressHandler = () => {
-        setActivePage('main')
+        dispatch(TodosReducer.actions.pageChanging({ page: 'main', index: '-1' }))
     }
 
     return <>

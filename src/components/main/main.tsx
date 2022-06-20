@@ -2,7 +2,7 @@ import { FC } from "react"
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useDispatch } from "react-redux"
 import { useAppSelector } from "../../hooks/hooks"
-import { todoGroupType } from "../../models/models"
+import { PagesTypes, todoGroupType } from "../../models/models"
 import { TodosReducer } from "../../store/reducers/TodosReducer"
 import { CustomButton } from "../common/button"
 import { CustomText } from "../common/customText"
@@ -10,9 +10,8 @@ import { Header } from "../header/header"
 import { TodoGroup } from "./todoGroup/todoGroup"
 
 type MainPropsType = {
-    setActivePage: (id: string) => void
 }
-export const Main: FC<MainPropsType> = ({ setActivePage }) => {
+export const Main: FC<MainPropsType> = ({ }) => {
 
     const { todoGroups } = useAppSelector(state => state.TodosReducer)
     const dispatch = useDispatch()
@@ -26,10 +25,11 @@ export const Main: FC<MainPropsType> = ({ setActivePage }) => {
             countTodos: 0
         }
         dispatch(TodosReducer.actions.todoGroupAdding(data))
-        setTimeout(() => {
-            console.log(todoGroups.length)
-            setActivePage(data.id)
-        }, 1000)
+        dispatch(TodosReducer.actions.pageChanging({ page: 'todoForm', index: data.id }))
+    }
+
+    const activePageHandler = (index: string) => {
+        dispatch(TodosReducer.actions.pageChanging({ page: 'todoForm', index }))
     }
 
     return <>
@@ -42,12 +42,9 @@ export const Main: FC<MainPropsType> = ({ setActivePage }) => {
                 <CustomText addStyle={style.buttonContainer__text} fontType='700' text="Add list" />
             </View>
             <ScrollView horizontal style={style.todoGroups} >
-                {todoGroups.map(el => <TouchableOpacity key={el.id}
-                        activeOpacity={0.7}
-                        onPress={() => setActivePage(el.id)}
-                    >
-                        <TodoGroup content={el} />
-                    </TouchableOpacity>)}
+                {todoGroups.map(el => <TodoGroup key={el.id} 
+                    content={el} activePageHandler={activePageHandler} 
+                />)}
             </ScrollView>
         </View>
     </>

@@ -1,4 +1,4 @@
-import { todoGroupType, todoType } from './../../models/models';
+import { todoGroupType, todoType, PagesTypes } from './../../models/models';
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 const initialState = {
@@ -6,7 +6,9 @@ const initialState = {
         { id: '1', name: 'First todo', countDoneTodos: 1, countTodos: 3,  todos: [{id: '11', isChecked: false, text: 'first', isActive: false}, {id: '12', isChecked: true, text: 'second', isActive: false}, {id: '13', isChecked: false, text: 'third', isActive: false}] },
         { id: '2', name: 'Second todo', countDoneTodos: 0, countTodos: 0, todos: [] },
         { id: '3', name: 'Third todo', countDoneTodos: 0, countTodos: 0, todos: [] },
-    ] as todoGroupType[]
+    ] as todoGroupType[],
+    activePage: 'main' as PagesTypes,
+    indexGroupPage: '-1'
 }
 
 export const TodosReducer = createSlice({
@@ -23,9 +25,12 @@ export const TodosReducer = createSlice({
             state.todoGroups.find( el => el.id === action.payload.id)
                 .name = action.payload.name
         },
+        todoGroupDeleting(state, action: PayloadAction<string>) {
+            state.todoGroups = [...state.todoGroups.filter(el => el.id !== action.payload)]
+        },
         todoAdding(state, action: PayloadAction<{todo: todoType, todoGroupId: string}>) {
             state.todoGroups.find(el => el.id === action.payload.todoGroupId).todos = [
-                ...state.todoGroups.find(el => el.id === action.payload.todoGroupId).todos,
+                ...state.todoGroups.find(el => el.id === action.payload.todoGroupId).todos, 
                 action.payload.todo
             ]
             state.todoGroups.find(el => el.id === action.payload.todoGroupId).countTodos++
@@ -46,13 +51,17 @@ export const TodosReducer = createSlice({
             state.todoGroups.find( el => el.id === action.payload.todoGroupId)
                 .todos = [
                     ...state.todoGroups.find( el => el.id === action.payload.todoGroupId).todos
-                        .filter( el => el.id != action.payload.todo.id)
+                        .filter( el => el.id !== action.payload.todo.id)
                 ]
             state.todoGroups.find(el => el.id === action.payload.todoGroupId).countTodos--
             
             if (isChecked) {
                 state.todoGroups.find(el => el.id === action.payload.todoGroupId).countDoneTodos--
             }
+        },
+        pageChanging(state, action: PayloadAction<{ page: PagesTypes, index: string }>) {
+            state.activePage = action.payload.page
+            state.indexGroupPage = action.payload.index
         }
     }
 })
